@@ -1,0 +1,127 @@
+// NutriPlate database schema (PostgreSQL on Supabase).
+// Users live in Supabase Auth; we only store their id as `userId`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled connection (app runtime)
+  directUrl = env("DIRECT_URL")   // direct connection (migrations)
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+/// Shared, read-only food database (values per 100 g).
+model Food {
+  id           String   @id @default(uuid())
+  source       String? // e.g. "USDA" or "OFF" (Open Food Facts)
+  externalId   String? // id in the source database, used to avoid duplicate imports
+  name         String
+  imageUrl     String?
+  category     String
+  calories     Float // kcal per 100 g
+  protein      Float // g per 100 g
+  carbs        Float // g per 100 g
+  fat          Float // g per 100 g
+  allergens    String[]
+  isVegetarian Boolean  @default(false)
+  isVegan      Boolean  @default(false)
+
+  ingredients Ingredient[]
+
+  @@unique([source, externalId])
+  @@index([name])
+  @@index([category])
+}
+
+model Recipe {
+  id        String   @id @default(uuid())
+  userId    String // Supabase Auth user id
+  name      String
+  imageUrl  String?
+  steps     String[] // preparation steps in order
+  portions  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ingredients Ingredient[]
+  tags        RecipeTag[]
+  planned     PlannedRecipe[]
+
+  @@index([userId])
+}
+
+model Ingredient {
+  id            String @id @default(uuid())
+  recipeId      String
+  foodId        String
+  quantityGrams Float
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  food   Food   @relation(fields: [foodId], references: [id])
+
+  @@index([recipeId])
+}
+
+model Tag {
+  id     String @id @default(uuid())
+  userId String
+  name   String
+
+  recipes RecipeTag[]
+
+  @@unique([userId, name])
+}
+
+model RecipeTag {
+  recipeId String
+  tagId    String
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([recipeId, tagId])
+}
+
+model NutritionProfile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  targetCalories     Float
+  targetProtein      Float
+  targetCarbs        Float
+  targetFat          Float
+  dietaryPreferences String[] // e.g. "vegetarian", "vegan"
+  allergies          String[]
+  avoidedIngredients String[]
+  mealsPerDay        Int      @default(3)
+}
+
+model DailyMealPlan {
+  id     String   @id @default(uuid())
+  userId String
+  date   DateTime @db.Date
+
+  meals PlannedRecipe[]
+
+  @@unique([userId, date])
+}
+
+model PlannedRecipe {
+  id       String   @id @default(uuid())
+  planId   String
+  recipeId String
+  mealType MealType
+  portions Float    @default(1)
+
+  plan   DailyMealPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  recipe Recipe        @relation(fields: [recipeId], references: [id])
+
+  @@index([planId])
+}
