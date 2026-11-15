@@ -23,32 +23,27 @@ Each team member keeps their own repository and stays individually responsible f
 
 ## Sprint 1 (15 Nov to 22 Nov): Setup and authentication
 
-**Goal:** a running skeleton with a working login/register flow connected to Supabase, plus the first diagrams.
+**Goal:** a running skeleton with working login/register connected to Supabase, plus the first diagrams.
 
-- Initialize repository structure
-- React client (Vite + Tailwind)
-- Express API skeleton
-- Supabase project and local setup
-- Prisma schema from the class diagram
-- Registration, login/logout, protected routes
-- API authentication middleware
-- Jest setup and first tests
-- Sprint plan, architecture diagram, class diagrams (domain + backend design)
-
-**Status (15 Nov):** repo structure, client, API skeleton, Prisma schema, login/register, protected routes, API auth middleware, Jest tests, architecture and class diagrams are done. Still open: creating the Supabase project (online + local), running the first migration, and testing login end to end against real Supabase keys.
+| # | Task | Status |
+|---|---|---|
+| 1 | Project setup: repository, React client and Express API | Done |
+| 2 | Supabase and database (Prisma schema) | Schema written; Supabase project and migration open |
+| 3 | User authentication: register, login and protected pages | Code written; test with real Supabase open |
+| 4 | Architecture and class diagrams (first versions) | Done |
+| 5 | Sprint plan and backlog | Done |
 
 ## Sprint 2 (22 Nov to 29 Nov): Foods and nutrition core
 
 **Goal:** users can browse and search real food data, and the nutrition calculation is in place.
 
-- Food data source decision and import script
-- Foods API: list/search/filter and detail
-- Foods page and food detail view
-- Nutrition service (totals and per portion) with tests
-- Recipes API: create and list, transactional
-- Users only see their own data
-- Recipe creation form (stretch)
-- Sprint review, diagram and report update
+| # | Task |
+|---|---|
+| 6 | Food database: choose a data source and import foods |
+| 7 | Browse, search and view foods (FR-1) |
+| 8 | Nutrition calculation for recipes (FR-3) |
+| 9 | Create and view recipes (FR-2, first part) |
+| 10 | Sprint review and report |
 
 ## Later sprints (rough)
 
@@ -60,4 +55,5 @@ Each team member keeps their own repository and stays individually responsible f
 
 ## Open questions / difficulties
 
-(Add during the sprint and bring to class.)
+- Which kind of class diagram does the lecturer expect: the domain (conceptual) diagram, the design (implementation) diagram, or both? Both are in `docs/class-diagrams.md`.
+- Prisma schema is not validated yet (needs `npx prisma validate` on a machine with network access to Prisma's engines).
